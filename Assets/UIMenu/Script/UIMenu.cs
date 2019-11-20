@@ -567,7 +567,7 @@ namespace UIComponentLib
             _menuBlocker = null;
         }
 
-        private void AdjustMenuPosition(RectTransform menu, RectTransform anchor, RectTransform rootCanvas)
+        private Vector2 AdjustMenuPosition(RectTransform menu, RectTransform anchor, RectTransform rootCanvas)
         {
             Vector3[] array = new Vector3[4];
             menu.GetWorldCorners(array);
@@ -594,6 +594,8 @@ namespace UIComponentLib
 
             if (needFlipY)
                 RectTransformUtility.FlipLayoutOnAxis(menu, 1, false, false);
+
+            return new Vector2(needFlipX ? 1 : 0, needFlipY ? 1 : 0);
         }
 
         private void OnFocusMenuItem(UIMenuItem item)
@@ -609,6 +611,13 @@ namespace UIComponentLib
                 RectTransform subMenuBoard = subMenuContainer.transform.GetChild(0) as RectTransform;
                 RectTransform containerRT = subMenuContainer.GetComponent<RectTransform>();
                 RectTransform rootRT = rootCanvas.GetComponent<RectTransform>();
+
+                // Fix : 当菜单放到其他方向时，子菜单方向不正确问题
+                subMenuBoard.pivot = new Vector2(0, 0);
+                subMenuBoard.anchorMin = new Vector2(1, 0);
+                subMenuBoard.anchorMax = new Vector2(1, 0);
+                subMenuBoard.anchoredPosition = Vector3.zero;
+
                 AdjustMenuPosition(subMenuBoard, containerRT, rootRT);
             }
         }
